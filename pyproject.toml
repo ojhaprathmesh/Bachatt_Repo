@@ -1,0 +1,33 @@
+[project]
+name = "bachatt-habit-coach"
+version = "0.1.0"
+description = "Financial Habit Coach - Agentic Voice & Behavioral Finance System"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "pydantic>=2.6.0",
+    "httpx>=0.27.0",
+    "openai>=1.14.0",
+    "python-dotenv>=1.0.1",
+    "aiosqlite>=0.20.0",
+    "pandas>=2.2.0",
+    "python-multipart>=0.0.9",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "frontend",
+    "data"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

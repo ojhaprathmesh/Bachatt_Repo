@@ -5,36 +5,42 @@
 
 ---
 
-## 🚀 Quickstart for Team Members
+## 🚀 Quickstart with pnpm Workspace & uv
 
-### 1. Environment Setup
-Copy the template and fill in your API keys (Sarvam AI, ElevenLabs, OpenAI):
+### 1. Root & Monorepo Setup (pnpm)
 ```bash
-cp .env.example .env
+# Install all workspace dependencies
+pnpm install
+
+# Run frontend via workspace
+pnpm dev
+
+# Typecheck and lint frontend
+pnpm typecheck
+pnpm lint
+pnpm build
 ```
 
-### 2. Backend (Member 1 Domain)
+### 2. Backend & Python Setup (uv & ruff)
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Environment setup
+cp .env.example .env
+
+# Using uv (lightning fast Python package runner)
+uv venv
+source .venv/bin/activate
+uv pip install -r backend/requirements.txt
+
+# Lint and check python errors with ruff
+ruff check .
+ruff format --check .
 
 # Ingest hackathon data (sms.csv, sip_plans.csv, mandates.csv)
-python -m db.loader
+python -m backend.db.loader
 
 # Run FastAPI Server (port 8000)
-python server.py
+python -m backend.server
 ```
-
-### 3. Frontend (Member 2 Domain)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Visit `http://localhost:5173` to interact with the Voice Coach and Single Habit Card.
 
 ---
 

@@ -2,17 +2,20 @@
 FastAPI Server: Core API Gateway for Financial Habit Coach.
 Exposes endpoints for Profile, Pattern Analysis, Voice Check-in, and Autonomous Actions.
 """
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 import uuid
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+from backend.memory.longitudinal_store import get_user_memory, update_user_memory
 from backend.schemas import (
-    UserHabitProfile, ActionTriggerRequest, ActionTriggerResponse,
-    VoiceCheckinRequest, VoiceCheckinResponse
+    ActionTriggerRequest,
+    ActionTriggerResponse,
+    UserHabitProfile,
+    VoiceCheckinRequest,
+    VoiceCheckinResponse,
 )
 from backend.services.analyzer import analyze_user_patterns
 from backend.services.voice_coach import synthesize_speech_sarvam
-from backend.memory.longitudinal_store import get_user_memory, update_user_memory
 
 app = FastAPI(title="Bachatt Financial Habit Coach API", version="1.0.0")
 
@@ -44,26 +47,26 @@ def execute_action(req: ActionTriggerRequest):
         transaction_id=f"TXN_{uuid.uuid4().hex[:8].upper()}",
         message=f"₹{amount:.0f} successfully moved to your Smart Reserve. Habit streak incremented!",
         updated_streak_days=new_streak,
-        total_saved_inr=updated_mem["total_saved_inr"]
+        total_saved_inr=updated_mem["total_saved_inr"],
     )
 
 @app.post("/api/coach/voice-checkin", response_model=VoiceCheckinResponse)
 async def voice_checkin(req: VoiceCheckinRequest):
     profile = analyze_user_patterns(req.user_id)
-    
+
     reply_text = (
         f"Namaste {profile.persona_name} ji! Pichle hafte humne EMI buffer ka target rakha tha, "
         f"lekin Saturday ko debit bounce hua. Is hafte hum sirf EK simple habit par focus karenge: "
         f"Roz subah ₹50 apne Smart Reserve mein alag kar dein. Kya main aaj ka ₹50 transfer initiate kar doon?"
     )
-    
+
     audio_base64 = await synthesize_speech_sarvam(reply_text, req.language_code)
 
     return VoiceCheckinResponse(
         transcription="Namaste Coach, pichle hafte ka kya update hai?",
         coach_reply_text=reply_text,
         coach_reply_audio_base64=audio_base64,
-        updated_profile=profile
+        updated_profile=profile,
     )
 
 if __name__ == "__main__":

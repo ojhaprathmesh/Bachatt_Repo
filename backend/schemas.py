@@ -2,7 +2,7 @@
 Shared Data Transfer Objects (DTOs) and Schemas for Bachatt Financial Habit Coach.
 Contract shared between Backend (Member 1) and Frontend (Member 2).
 """
-from typing import List, Optional, Dict, Any
+from typing import Optional
 from pydantic import BaseModel, Field
 
 class HabitCommitment(BaseModel):

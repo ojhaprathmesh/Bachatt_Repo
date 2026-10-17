@@ -3,9 +3,9 @@ Voice Coach Service: Integrates Sarvam AI (https://indus.sarvam.ai) and ElevenLa
 Member 1 Domain.
 """
 import os
-import httpx
-from typing import Optional, Dict, Any
+from typing import Optional
 from dotenv import load_dotenv
+import httpx
 
 load_dotenv()
 
@@ -28,12 +28,18 @@ async def transcribe_audio_sarvam(audio_bytes: bytes, language_code: str = "hi-I
 
     try:
         async with httpx.AsyncClient() as client:
-            resp = await client.post(f"{SARVAM_API_URL}/speech-to-text", headers=headers, files=files, data=data, timeout=10.0)
+            resp = await client.post(
+                f"{SARVAM_API_URL}/speech-to-text",
+                headers=headers,
+                files=files,
+                data=data,
+                timeout=10.0,
+            )
             if resp.status_code == 200:
                 return resp.json().get("transcript", "")
     except Exception as e:
         print(f"Sarvam STT error: {e}")
-    
+
     return "Haan, theek hai, aaj ka ₹50 save kar do."
 
 async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> Optional[str]:
@@ -46,7 +52,7 @@ async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> O
 
     headers = {
         "api-subscription-key": SARVAM_API_KEY,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     payload = {
         "inputs": [text],
@@ -57,12 +63,17 @@ async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> O
         "loudness": 1.5,
         "speech_sample_rate": 22050,
         "enable_preprocessing": True,
-        "model": "bulbul:v1"
+        "model": "bulbul:v1",
     }
 
     try:
         async with httpx.AsyncClient() as client:
-            resp = await client.post(f"{SARVAM_API_URL}/text-to-speech", headers=headers, json=payload, timeout=10.0)
+            resp = await client.post(
+                f"{SARVAM_API_URL}/text-to-speech",
+                headers=headers,
+                json=payload,
+                timeout=10.0,
+            )
             if resp.status_code == 200:
                 audios = resp.json().get("audios", [])
                 if audios:
