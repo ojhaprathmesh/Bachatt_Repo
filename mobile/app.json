@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Bachatt Mitra",
+    "slug": "bachatt-mitra",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#020617",
+    "android": {
+      "package": "com.bachatt.mitra"
+    }
+  }
+}

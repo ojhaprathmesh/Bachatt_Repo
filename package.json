@@ -6,6 +6,8 @@
     "dev": "pnpm --filter frontend dev",
     "build": "pnpm --filter frontend build",
     "lint": "pnpm --filter frontend lint",
-    "typecheck": "pnpm --filter frontend typecheck"
+    "typecheck": "pnpm --filter frontend typecheck",
+    "mobile": "pnpm --filter mobile start",
+    "mobile:android": "pnpm --filter mobile android"
   }
 }

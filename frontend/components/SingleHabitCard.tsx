@@ -25,10 +25,24 @@ export const SingleHabitCard: React.FC<SingleHabitCardProps> = ({ habit, onActio
       <h2 className="text-xl font-bold text-white mb-1">{habit.title}</h2>
       <p className="text-sm text-slate-400 mb-4">{habit.tagline}</p>
 
-      <div className="bg-slate-800/50 rounded-2xl p-4 mb-5 border border-slate-700/50">
+      <div className="bg-slate-800/50 rounded-2xl p-4 mb-4 border border-slate-700/50">
         <p className="text-xs text-slate-300 leading-relaxed">
           <strong className="text-white">Why this matters:</strong> {habit.rationale}
         </p>
+      </div>
+
+      {/* Weekly Consistency Progress Bar */}
+      <div className="mb-5">
+        <div className="flex justify-between items-center text-xs mb-1.5">
+          <span className="text-slate-400 font-medium">Weekly Consistency Goal</span>
+          <span className="text-emerald-400 font-bold">{habit.current_streak_days} / 7 days</span>
+        </div>
+        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${Math.min(100, Math.max(12, Math.round((habit.current_streak_days / 7) * 100)))}%` }}
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between pt-2 border-t border-slate-800">

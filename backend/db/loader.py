@@ -19,31 +19,42 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # Ingest SMS table if exists
+    # 1. Ingest SMS table
     sms_csv = RAW_DATA_DIR / "sms" / "sms.csv"
     if sms_csv.exists():
         print(f"Ingesting {sms_csv}...")
-        df_sms = pd.read_csv(sms_csv, nrows=10000)  # fast initial load
+        df_sms = pd.read_csv(sms_csv, dtype={"user_id": str})
         df_sms.to_sql("sms", conn, if_exists="replace", index=False)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_sms_user ON sms (user_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sms_date ON sms (received_at_ist);")
 
-    # Ingest SIP plans if exists
+    # 2. Ingest SIP plans
     sip_csv = RAW_DATA_DIR / "investment" / "sip_plans.csv"
     if sip_csv.exists():
         print(f"Ingesting {sip_csv}...")
-        df_sip = pd.read_csv(sip_csv)
+        df_sip = pd.read_csv(sip_csv, dtype={"user_id": str})
         df_sip.to_sql("sip_plans", conn, if_exists="replace", index=False)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_sip_user ON sip_plans (user_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sip_status ON sip_plans (status);")
 
-    # Ingest Mandates if exists
+    # 3. Ingest Mandates
     mandates_csv = RAW_DATA_DIR / "insurance" / "mandates.csv"
     if mandates_csv.exists():
         print(f"Ingesting {mandates_csv}...")
-        df_mandates = pd.read_csv(mandates_csv)
+        df_mandates = pd.read_csv(mandates_csv, dtype={"user_id": str})
         df_mandates.to_sql("mandates", conn, if_exists="replace", index=False)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_mandate_user ON mandates (user_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_mandate_status ON mandates (status);")
 
-    # User habit ledger for actions
+    # 4. Ingest Loan EMIs
+    emis_csv = RAW_DATA_DIR / "loan" / "emis.csv"
+    if emis_csv.exists():
+        print(f"Ingesting {emis_csv}...")
+        df_emis = pd.read_csv(emis_csv, dtype={"user_id": str})
+        df_emis.to_sql("loan_emis", conn, if_exists="replace", index=False)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_emi_user ON loan_emis (user_id);")
+
+    # 5. User habit ledger for actions
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS habit_ledger (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

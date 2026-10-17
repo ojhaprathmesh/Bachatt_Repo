@@ -21,8 +21,13 @@ export interface ActiveHabit {
   current_streak_days: number;
   best_streak_days: number;
   money_protected_inr: number;
-  action_type: 'MICRO_SAVE' | 'RESUME_SIP' | 'BALANCE_BUFFER';
+  action_type: 'MICRO_SAVE' | 'RESUME_SIP' | 'BALANCE_BUFFER' | 'MANDATE_PROTECTION' | 'SIP_RESUME' | string;
   suggested_amount_inr: number;
+}
+
+export interface DemoPersona {
+  user_id: string;
+  display_name: string;
 }
 
 export interface UserHabitProfile {
