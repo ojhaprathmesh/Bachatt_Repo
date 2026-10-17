@@ -2,14 +2,17 @@
 Database Loader: Ingests hackathon CSVs into SQLite for high-speed querying.
 Member 1 Domain.
 """
+
 import os
 import sqlite3
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 DB_DIR = Path(__file__).resolve().parent.parent / "data"
 DB_PATH = DB_DIR / "bachatt_coach.db"
 RAW_DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+
 
 def init_db():
     os.makedirs(DB_DIR, exist_ok=True)
@@ -55,6 +58,7 @@ def init_db():
     conn.commit()
     conn.close()
     print(f"Database initialized successfully at {DB_PATH}")
+
 
 if __name__ == "__main__":
     init_db()

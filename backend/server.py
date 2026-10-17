@@ -2,7 +2,9 @@
 FastAPI Server: Core API Gateway for Financial Habit Coach.
 Exposes endpoints for Profile, Pattern Analysis, Voice Check-in, and Autonomous Actions.
 """
+
 import uuid
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,13 +29,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "Bachatt Financial Habit Coach"}
 
+
 @app.get("/api/coach/profile/{user_id}", response_model=UserHabitProfile)
 def get_coach_profile(user_id: str):
     return analyze_user_patterns(user_id)
+
 
 @app.post("/api/coach/execute-action", response_model=ActionTriggerResponse)
 def execute_action(req: ActionTriggerRequest):
@@ -49,6 +54,7 @@ def execute_action(req: ActionTriggerRequest):
         updated_streak_days=new_streak,
         total_saved_inr=updated_mem["total_saved_inr"],
     )
+
 
 @app.post("/api/coach/voice-checkin", response_model=VoiceCheckinResponse)
 async def voice_checkin(req: VoiceCheckinRequest):
@@ -69,6 +75,8 @@ async def voice_checkin(req: VoiceCheckinRequest):
         updated_profile=profile,
     )
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

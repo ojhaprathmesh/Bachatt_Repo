@@ -2,9 +2,12 @@
 Level 2 Intelligence Engine: Pattern Detection & Habit Profiler.
 Member 1 Domain.
 """
+
 import sqlite3
+
 from backend.db.loader import DB_PATH
 from backend.schemas import ActiveHabit, HabitCommitment, UserHabitProfile
+
 
 def analyze_user_patterns(user_id: str) -> UserHabitProfile:
     """
@@ -43,7 +46,7 @@ def analyze_user_patterns(user_id: str) -> UserHabitProfile:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT body_text FROM sms 
+                SELECT body_text FROM sms
                 WHERE user_id = ? AND (body_text LIKE '%failed%' OR body_text LIKE '%INSUFFICIENT%')
                 LIMIT 1
                 """,

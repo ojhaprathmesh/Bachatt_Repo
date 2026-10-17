@@ -2,10 +2,12 @@
 Voice Coach Service: Integrates Sarvam AI (https://indus.sarvam.ai) and ElevenLabs.
 Member 1 Domain.
 """
+
 import os
 from typing import Optional
-from dotenv import load_dotenv
+
 import httpx
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -13,6 +15,7 @@ SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 SARVAM_API_URL = os.getenv("SARVAM_API_URL", "https://api.sarvam.ai")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 
 async def transcribe_audio_sarvam(audio_bytes: bytes, language_code: str = "hi-IN") -> str:
     """
@@ -41,6 +44,7 @@ async def transcribe_audio_sarvam(audio_bytes: bytes, language_code: str = "hi-I
         print(f"Sarvam STT error: {e}")
 
     return "Haan, theek hai, aaj ka ₹50 save kar do."
+
 
 async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> Optional[str]:
     """

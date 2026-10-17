@@ -1,5 +1,5 @@
 import React from 'react';
-import { History, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { History, AlertTriangle } from 'lucide-react';
 import { HabitCommitment } from '../types/coach';
 
 interface MemoryTimelineProps {

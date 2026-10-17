@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Flame, ShieldCheck } from 'lucide-react';
 import { ActiveHabit } from '../types/coach';
 
 interface SingleHabitCardProps {
