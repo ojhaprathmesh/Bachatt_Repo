@@ -86,25 +86,54 @@ def execute_action(req: ActionTriggerRequest):
     )
 
 
-@app.post("/api/coach/voice-checkin", response_model=VoiceCheckinResponse)
+from backend.services.agent import run_autonomous_agent
+
+
+@app.post("/api/coach/voice-checkin")
 async def voice_checkin(req: VoiceCheckinRequest):
-    profile = analyze_user_patterns(req.user_id)
+    prompt = req.text_prompt or "Namaste Coach, pichle hafte ka kya update hai?"
+    res = await run_autonomous_agent(req.user_id, prompt, req.language_code)
+    return {
+        "transcription": prompt,
+        "coach_reply_text": res["agent_reply_text"],
+        "coach_reply_audio_base64": res.get("agent_reply_audio_base64"),
+        "thought_process": res.get("thought_process"),
+        "actions_taken": res.get("actions_taken", []),
+        "updated_profile": res["updated_profile"],
+    }
 
-    habit = profile.active_habit
-    reply_text = (
-        f"Namaste {profile.persona_name} ji! Pichle hafte humne buffer ka target rakha tha. "
-        f"Is hafte hum sirf EK simple habit par focus karenge: {habit.title} ({habit.tagline}). "
-        f"Kya main aaj ka ₹{habit.suggested_amount_inr:.0f} transfer initiate kar doon?"
-    )
 
-    audio_base64 = await synthesize_speech_sarvam(reply_text, req.language_code)
+@app.post("/api/coach/agent-run")
+async def agent_run(payload: dict):
+    user_id = payload.get("user_id", "1751385702744480")
+    prompt = payload.get("prompt", "Please execute the recommended single habit for me.")
+    lang = payload.get("language_code", "hi-IN")
+    return await run_autonomous_agent(user_id, prompt, lang)
 
-    return VoiceCheckinResponse(
-        transcription=req.text_prompt or "Namaste Coach, pichle hafte ka kya update hai?",
-        coach_reply_text=reply_text,
-        coach_reply_audio_base64=audio_base64,
-        updated_profile=profile,
-    )
+
+@app.get("/api/coach/elevenlabs/signed-url")
+async def get_elevenlabs_signed_url():
+    """
+    Returns signed WebSocket URL for ElevenLabs Conversational AI Web SDK.
+    """
+    import os
+    import httpx
+    api_key = os.getenv("ELEVENLABS_API_KEY", "")
+    agent_id = os.getenv("ELEVENLABS_AGENT_ID", "agent_4501m54njtdkem0aacw0b69ayre4")
+
+    if not api_key:
+        return {"error": "ELEVENLABS_API_KEY not configured"}
+
+    headers = {"xi-api-key": api_key}
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id={agent_id}",
+            headers=headers,
+            timeout=10.0,
+        )
+        if resp.status_code == 200:
+            return resp.json()
+        return {"error": f"ElevenLabs API error: {resp.status_code}", "detail": resp.text}
 
 
 if __name__ == "__main__":

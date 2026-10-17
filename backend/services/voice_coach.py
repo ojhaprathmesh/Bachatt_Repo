@@ -1,8 +1,9 @@
 """
-Voice Coach Service: Integrates Sarvam AI (https://indus.sarvam.ai) and ElevenLabs.
-Member 1 Domain.
+Voice Coach Service: ElevenLabs Ultra-Low Latency Conversational Voice Engine.
+Powered by ElevenLabs Multilingual V2 and Conversational Agent API.
 """
 
+import base64
 import os
 from typing import Optional
 
@@ -11,78 +12,55 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-SARVAM_API_URL = os.getenv("SARVAM_API_URL", "https://api.sarvam.ai")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")
+ELEVENLABS_MODEL_ID = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2")
+ELEVENLABS_AGENT_ID = os.getenv("ELEVENLABS_AGENT_ID", "agent_4501m54njtdkem0aacw0b69ayre4")
 
 
-async def transcribe_audio_sarvam(audio_bytes: bytes, language_code: str = "hi-IN") -> str:
+async def synthesize_speech_elevenlabs(text: str, voice_id: Optional[str] = None) -> Optional[str]:
     """
-    Transcribes spoken voice using Sarvam AI Saaras model.
-    Docs: https://indus.sarvam.ai
+    Synthesizes natural conversational voice using ElevenLabs API.
+    Returns base64 encoded audio/mp3 string.
     """
-    if not SARVAM_API_KEY:
-        return "Haan, theek hai, aaj ka ₹50 save kar do."
-
-    headers = {"api-subscription-key": SARVAM_API_KEY}
-    files = {"file": ("audio.wav", audio_bytes, "audio/wav")}
-    data = {"model": "saaras:v1", "language_code": language_code}
-
-    try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.post(
-                f"{SARVAM_API_URL}/speech-to-text",
-                headers=headers,
-                files=files,
-                data=data,
-                timeout=10.0,
-            )
-            if resp.status_code == 200:
-                return resp.json().get("transcript", "")
-    except Exception as e:
-        print(f"Sarvam STT error: {e}")
-
-    return "Haan, theek hai, aaj ka ₹50 save kar do."
-
-
-async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> Optional[str]:
-    """
-    Synthesizes conversational spoken voice using Sarvam Bulbul model.
-    Returns base64 audio string or URL.
-    """
-    if not SARVAM_API_KEY:
+    if not ELEVENLABS_API_KEY:
         return None
 
+    vid = voice_id or ELEVENLABS_VOICE_ID or "EXAVITQu4vr4xnSDxMaL"
     headers = {
-        "api-subscription-key": SARVAM_API_KEY,
+        "xi-api-key": ELEVENLABS_API_KEY,
         "Content-Type": "application/json",
     }
     payload = {
-        "inputs": [text],
-        "target_language_code": language_code,
-        "speaker": "meera",
-        "pitch": 0,
-        "pace": 1.05,
-        "loudness": 1.5,
-        "speech_sample_rate": 22050,
-        "enable_preprocessing": True,
-        "model": "bulbul:v1",
+        "text": text,
+        "model_id": ELEVENLABS_MODEL_ID,
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75,
+            "style": 0.35,
+            "use_speaker_boost": True,
+        },
     }
 
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{SARVAM_API_URL}/text-to-speech",
+                f"https://api.elevenlabs.io/v1/text-to-speech/{vid}",
                 headers=headers,
                 json=payload,
-                timeout=10.0,
+                timeout=20.0,
             )
-            if resp.status_code == 200:
-                audios = resp.json().get("audios", [])
-                if audios:
-                    return audios[0]
+            if resp.status_code == 200 and len(resp.content) > 0:
+                return base64.b64encode(resp.content).decode("utf-8")
+            else:
+                print(f"[ElevenLabs TTS Error] Status {resp.status_code}: {resp.text}")
     except Exception as e:
-        print(f"Sarvam TTS error: {e}")
+        print(f"[ElevenLabs TTS Exception] {e}")
 
     return None
+
+
+# Backward-compatible alias for existing service calls
+async def synthesize_speech_sarvam(text: str, language_code: str = "hi-IN") -> Optional[str]:
+    """Redirected to ElevenLabs API as requested by user."""
+    return await synthesize_speech_elevenlabs(text)

@@ -30,11 +30,64 @@ class ActiveHabit(BaseModel):
     suggested_amount_inr: float = 50.0
 
 
+class Level1Explainer(BaseModel):
+    statement_summary: str
+    score_breakdown: list[str]
+    score_advice: str
+    policy_summary: str
+
+
+class RecurringLeak(BaseModel):
+    category: str
+    merchant: str
+    frequency: str
+    est_monthly_inr: float
+
+
+class CashflowDay(BaseModel):
+    date: str
+    day_name: str
+    projected_inflow_inr: float = 0.0
+    projected_outflow_inr: float = 0.0
+    status: str = "SAFE"  # "SAFE", "AT_RISK", "DANGER"
+    note: Optional[str] = None
+
+
+class Level2Intelligence(BaseModel):
+    cashflow_forecast: list[CashflowDay]
+    forecast_warning: Optional[str] = None
+    detected_leaks: list[RecurringLeak]
+    recommended_action: str
+
+
+class TransactionItem(BaseModel):
+    id: str
+    sender: str
+    merchant: str
+    amount_inr: float
+    date: str
+    is_failure: bool
+    snippet: str
+
+
+class FinancialMetrics(BaseModel):
+    total_sms_analyzed: int
+    total_discretionary_spend_inr: float
+    failed_debits_count: int
+    mandates_at_risk_count: int
+    active_streak_days: int
+    total_saved_inr: float
+
+
 class UserHabitProfile(BaseModel):
     user_id: str
     persona_name: str
     habit_resilience_score: int = Field(ge=0, le=100)
     top_vulnerability: str
+    metrics: FinancialMetrics
+    recent_transactions: list[TransactionItem]
+    level1: Level1Explainer
+    level2: Level2Intelligence
     active_habit: ActiveHabit
     last_week_commitment: Optional[HabitCommitment] = None
 

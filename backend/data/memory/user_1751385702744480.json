@@ -1,0 +1,14 @@
+{
+  "user_id": "1751385702744480",
+  "persona_name": "Ramesh",
+  "streak_days": 13,
+  "total_saved_inr": 1109.0,
+  "commitments": [
+    {
+      "week": 41,
+      "date": "2026-10-07",
+      "goal": "Maintain \u20b9100 buffer for EMI",
+      "status": "BROKEN"
+    }
+  ]
+}

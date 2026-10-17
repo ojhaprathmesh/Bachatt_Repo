@@ -7,5 +7,6 @@
     "jsx": "react-native",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  }
+  },
+  "extends": "expo/tsconfig.base"
 }
